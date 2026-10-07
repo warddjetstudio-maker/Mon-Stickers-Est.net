@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mon Stickers Est.net — Stickers qui collent à ta vie</title>
+<script src="https://js.stripe.com/v3/"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Figtree:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#000;--bg2:#0d0d10;--bg3:#16161b;--line:#2a2a33;--txt:#f5f5f7;--mut:#9b9ba8;--a:#ff3d81;--b:#7c5cff;--ok:#3ddc97}
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--txt);font:16px/1.55 Figtree,system-ui,sans-serif}
+h1,h2,h3,.logo{font-family:'Bricolage Grotesque',sans-serif;letter-spacing:-.02em}
+a{color:inherit;text-decoration:none}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--a);outline-offset:2px}
+.wrap{max-width:1160px;margin:auto;padding:0 20px}
+.bar{background:linear-gradient(90deg,var(--a),var(--b));text-align:center;padding:8px 12px;font-weight:700;font-size:14px}
+header{position:sticky;top:0;z-index:20;background:#000e;backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+header .wrap{display:flex;align-items:center;gap:20px;height:64px}
+.logo{font-size:22px;font-weight:800}.logo i{font-style:normal;color:var(--a)}
+nav{display:flex;gap:22px;margin-left:auto;color:var(--mut)}nav a:hover{color:#fff}
+body:not(.cart-on) .cartbtn{display:none!important}.cartbtn{background:#fff;color:#000;border:0;border-radius:99px;padding:9px 18px;font-weight:700;cursor:pointer}
+.cartbtn b{background:var(--a);color:#fff;border-radius:99px;padding:1px 8px;margin-left:6px;font-size:13px}
+.hero{padding:80px 0 60px;display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center}
+.hero h1{font-size:clamp(40px,7vw,84px);line-height:.98;font-weight:800}
+.hero p{color:var(--mut);max-width:480px;margin:20px 0 28px;font-size:18px}
+.btn{display:inline-block;border:0;border-radius:12px;padding:14px 26px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,var(--a),var(--b));color:#fff}
+.btn.ghost{background:none;border:1px solid var(--line);margin-left:10px}
+.btn:hover{filter:brightness(1.12)}
+.stack{position:relative;height:340px}
+.stk{position:absolute;width:180px;height:180px;background:#fff;border-radius:42% 58% 55% 45%/50% 45% 55% 50%;display:grid;place-items:center;font-size:76px;box-shadow:0 14px 40px #ff3d8133}
+.stk:nth-child(1){left:6%;top:6%;transform:rotate(-12deg)}
+.stk:nth-child(2){right:4%;top:0;transform:rotate(9deg);background:#ffe14d}
+.stk:nth-child(3){left:30%;bottom:0;transform:rotate(4deg);background:#7ef0ff;width:210px;height:210px;font-size:90px}
+.perks{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:70px}
+.perk{background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:16px}
+.perk b{display:block}.perk span{color:var(--mut);font-size:14px}
+section{padding:50px 0}
+h2{font-size:clamp(28px,4vw,44px);margin-bottom:8px}
+.sub{color:var(--mut);margin-bottom:28px}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px}
+.chip{border:1px solid var(--line);background:none;border-radius:99px;padding:7px 16px;cursor:pointer;color:var(--mut)}
+.chip.on{background:#fff;color:#000;border-color:#fff;font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:18px}
+.card{background:var(--bg2);border:1px solid var(--line);border-radius:18px;overflow:hidden;display:flex;flex-direction:column;transition:.2s}
+.card:hover{border-color:var(--a);transform:translateY(-4px)}
+.card .im{aspect-ratio:1;background:var(--bg3);display:grid;place-items:center;padding:6px}
+.card img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 0 0 #fff) drop-shadow(0 0 3px #fff) drop-shadow(0 0 3px #fff)}
+.card .in{padding:16px;display:flex;flex-direction:column;gap:6px;flex:1}
+.card h3{font-size:18px}.card p{color:var(--mut);font-size:14px;flex:1}
+.row{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+.price{font-size:22px;font-weight:800;font-family:'Bricolage Grotesque'}.price small{font-size:12px;color:var(--mut);font-weight:400}
+.add{background:var(--a);border:0;border-radius:10px;padding:9px 14px;font-weight:700;cursor:pointer;color:#fff}
+.add{display:inline-block;text-align:center}.add:disabled,.add.off{background:var(--line);color:var(--mut);cursor:not-allowed}
+.empty{color:var(--mut);padding:40px;text-align:center;border:1px dashed var(--line);border-radius:16px;grid-column:1/-1}
+.custom{background:var(--bg2);border:1px solid var(--line);border-radius:24px;padding:36px;display:grid;grid-template-columns:1fr 1fr;gap:36px}
+label{display:block;font-size:14px;color:var(--mut);margin:12px 0 5px}
+input,select,textarea{width:100%;background:var(--bg3);border:1px solid var(--line);border-radius:10px;padding:11px 13px}
+textarea{min-height:80px;resize:vertical}
+.drop{border:2px dashed var(--line);border-radius:16px;min-height:260px;display:grid;place-items:center;text-align:center;color:var(--mut);cursor:pointer;padding:16px;overflow:hidden}
+.drop:hover{border-color:var(--a)}
+.drop img{max-width:100%;max-height:300px;border-radius:12px;background:#fff;padding:6px}
+.est{margin:16px 0;font-size:18px}.est b{font-size:26px;font-family:'Bricolage Grotesque'}
+.note{font-size:13px;color:var(--mut)}
+.ov{position:fixed;inset:0;background:#000a;z-index:40;display:none}.ov.on{display:block}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(420px,100%);background:var(--bg2);border-left:1px solid var(--line);z-index:50;transform:translateX(100%);transition:.3s;display:flex;flex-direction:column}
+.drawer.on{transform:none}
+.dh{padding:18px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.dh h3{font-size:22px}
+.x{background:none;border:0;font-size:26px;cursor:pointer;color:var(--mut)}
+.items{flex:1;overflow:auto;padding:12px 20px}
+.it{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.it img{width:56px;height:56px;object-fit:contain;background:var(--bg3);border-radius:10px}
+.it div{flex:1;font-size:14px}.it b{display:block}
+.q{display:flex;gap:6px;align-items:center}.q button{width:26px;height:26px;border-radius:7px;border:1px solid var(--line);background:none;cursor:pointer}
+.sum{padding:16px 20px;border-top:1px solid var(--line);font-size:15px}
+.sum div{display:flex;justify-content:space-between;margin:4px 0}.sum .t{font-size:20px;font-weight:800;margin-top:10px}
+.prog{height:6px;border-radius:9px;background:var(--bg3);margin:8px 0 10px;overflow:hidden}.prog i{display:block;height:100%;background:linear-gradient(90deg,var(--a),var(--b));transition:.3s}
+.modal{position:fixed;inset:0;z-index:60;display:none;place-items:center;padding:16px;background:#000b;overflow:auto}.modal.on{display:grid}
+.mb{background:var(--bg2);border:1px solid var(--line);border-radius:20px;padding:26px;width:min(560px,100%)}#checkout{margin:14px 0;min-height:200px}
+.ok{color:var(--ok)}
+footer{border-top:1px solid var(--line);padding:30px 0;color:var(--mut);font-size:14px;text-align:center;margin-top:40px}
+@media(max-width:800px){.hero,.custom{grid-template-columns:1fr}.perks{grid-template-columns:1fr 1fr}nav{display:none}.cartbtn{margin-left:auto}.stack{height:260px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="bar" id="bar">Livraison offerte dès 20 stickers achetés · Emballage offert</div>
+<header><div class="wrap">
+<a class="logo" href="#">Mon Stickers <i>Est</i>.net</a>
+<nav><a href="#catalogue">Catalogue</a><a href="#perso">Sur mesure</a><a href="#infos">Livraison</a></nav>
+<button class="cartbtn" id="openCart">Panier<b id="cnt">0</b></button>
+</div></header>
+
+<main class="wrap">
+<div class="hero">
+<div>
+<h1>Des stickers qui restent collés.</h1>
+<p>Vinyle résistant à l'eau et au soleil, découpe précise. Choisis dans le catalogue ou envoie ton propre dessin.</p>
+<a class="btn" href="#catalogue">Voir les stickers</a><a class="btn ghost" href="#perso">Créer le mien</a>
+</div>
+<div class="stack" aria-hidden="true"><div class="stk">⚡</div><div class="stk">🔥</div><div class="stk">👾</div></div>
+</div>
+
+<div class="perks" id="infos">
+<div class="perk"><b>Livraison offerte</b><span id="freeTxt">Dès 20 stickers achetés</span></div>
+<div class="perk"><b>TVA incluse</b><span>Tous les prix sont TTC</span></div>
+<div class="perk"><b>Emballage offert</b><span>Soigné, sans supplément</span></div>
+<div class="perk"><b>Livraison</b><span id="shipTxt">Non incluse dans le prix</span></div>
+</div>
+
+<section id="catalogue">
+<h2>Le catalogue</h2><p class="sub">Prix par sticker, TVA incluse, livraison non incluse.</p>
+<div class="filters" id="filters"></div>
+<div class="grid" id="grid"><div class="empty">Chargement…</div></div>
+</section>
+
+<section id="perso">
+<div class="custom">
+<div>
+<h2>Sticker personnalisé</h2>
+<p class="sub">Envoie ton image, on la reçoit directement et on te répond avec un devis.</p>
+<label for="cn">Ton nom</label><input id="cn" autocomplete="name">
+<label for="ce">E-mail</label><input id="ce" type="email" autocomplete="email">
+<label for="cs">Taille</label>
+<select id="cs"><option value="3.5">3,5 × 3,5 cm — 1,00 € le sticker</option></select>
+<label for="cq">Quantité</label><input id="cq" type="number" min="1" value="10">
+<label for="cm">Message (détails…)</label><textarea id="cm"></textarea>
+</div>
+<div>
+<label for="cf">Ton image (PNG, JPG, WebP)</label>
+<label class="drop" id="drop" for="cf"><span id="dropTxt">Clique pour choisir une image</span></label>
+<input id="cf" type="file" accept="image/*" hidden>
+<div class="est">Estimation : <b id="est">—</b><div class="note">TVA incluse · emballage offert · livraison en plus (offerte dès 20 stickers)</div></div>
+<button class="btn" id="sendC" style="width:100%">Envoyer ma demande</button>
+<p class="note" id="cmsg" style="margin-top:10px"></p>
+</div>
+</div>
+</section>
+</main>
+<footer>© <span id="yr"></span> Mon Stickers Est.net — Tous droits réservés</footer>
+
+<div class="ov" id="ov"></div>
+<aside class="drawer" id="drawer" aria-label="Panier">
+<div class="dh"><h3>Ton panier</h3><button class="x" id="closeCart" aria-label="Fermer">×</button></div>
+<div class="items" id="items"></div>
+<div class="sum" id="sum"></div>
+</aside>
+
+<div class="modal" id="modal"><div class="mb" id="mb"></div></div>
+
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {getFirestore,collection,getDocs,addDoc,doc,getDoc,serverTimestamp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const app=initializeApp({apiKey:"AIzaSyDhK7qWZ2953se-f2wiR2ieVBxH2BFQ-2s",authDomain:"mon-stickers-est-net.firebaseapp.com",projectId:"mon-stickers-est-net",storageBucket:"mon-stickers-est-net.firebasestorage.app",messagingSenderId:"1059721575264",appId:"1:1059721575264:web:0127672b5828a810fa7c05"});
+const db=getFirestore(app);
+const $=id=>document.getElementById(id), eur=n=>n.toLocaleString('fr-FR',{style:'currency',currency:'EUR'});
+// Liens de paiement Stripe (Payment Links, TVA 20 % activée dans Stripe).
+// Colle ici : id du produit Firestore -> lien https://buy.stripe.com/...
+// (ou ajoute un champ "stripeLink" sur le produit dans Firestore)
+const STRIPE_LINKS={};
+const STRIPE_PK="pk_live_51U4RfdHqnM4KBoe3tQOmcsIy60ttmjjOtuJMmz7T6xVUoFDRt3Z8FpBxrJ7cDT603Biv0Z8NoF0G5aRT3hWpWsxg004TlIgdzV";
+// URL de la Cloud Function "createCheckout" (donnée par firebase deploy). Vide = ancien mode liens de paiement.
+const CHECKOUT_URL="";
+const CART_MODE=!!CHECKOUT_URL;
+if(CART_MODE)document.body.classList.add('cart-on');
+const stripe=Stripe(STRIPE_PK);let embedded=null;
+let products=[],cart={},cat='Tous',S={shipping:3.9,freeFrom:20};
+try{cart=JSON.parse(localStorage.getItem('mse_cart')||'{}')}catch(e){}
+$('yr').textContent=new Date().getFullYear();
+
+async function load(){
+ try{const s=await getDoc(doc(db,'settings','shop'));if(s.exists())S={...S,...s.data()}}catch(e){}
+ $('bar').textContent=`Livraison offerte dès ${S.freeFrom} stickers achetés · Emballage offert`;
+ $('freeTxt').textContent=`Dès ${S.freeFrom} stickers achetés`;
+ $('shipTxt').textContent=`${eur(+S.shipping)} sinon (non incluse dans le prix)`;
+ try{const q=await getDocs(collection(db,'products'));products=q.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.created?.seconds||0)-(a.created?.seconds||0))}
+ catch(e){$('grid').innerHTML='<div class="empty">Impossible de charger le catalogue. Vérifie les règles Firestore.</div>';return}
+ render();renderCart();
+}
+function buyBtn(p){const l=p.stripeLink||STRIPE_LINKS[p.id];
+ if(p.stock===0)return'<button class="add" disabled>Épuisé</button>';
+ if(CART_MODE)return`<button class="add" data-id="${p.id}">Ajouter</button>`;
+ return l?`<a class="add" href="${l}" target="_blank" rel="noopener">Acheter</a>`:'<span class="add off" style="padding:9px 14px">Bientôt</span>'}
+function render(){
+ const cats=['Tous',...new Set(products.map(p=>p.cat).filter(Boolean))];
+ $('filters').innerHTML=cats.map(c=>`<button class="chip ${c===cat?'on':''}" data-c="${c}">${c}</button>`).join('');
+ const l=products.filter(p=>cat==='Tous'||p.cat===cat);
+ $('grid').innerHTML=l.length?l.map(p=>`<article class="card"><div class="im"><img src="${p.img}" alt="${p.name}" loading="lazy"></div><div class="in"><h3>${p.name}</h3><p>${p.desc||''}</p><div class="row"><span class="price">${eur(+p.price)}<small> TTC · TVA 20 % incluse</small></span>${buyBtn(p)}</div></div></article>`).join(''):'<div class="empty">Aucun sticker pour le moment. Reviens vite !</div>';
+}
+$('filters').onclick=e=>{if(e.target.dataset.c){cat=e.target.dataset.c;render()}};
+$('grid').onclick=e=>{const id=e.target.dataset.id;if(id){cart[id]=(cart[id]||0)+1;save();openCart()}};
+function save(){try{localStorage.setItem('mse_cart',JSON.stringify(cart))}catch(e){}renderCart()}
+function totals(){let n=0,sub=0;for(const id in cart){const p=products.find(x=>x.id===id);if(!p){continue}n+=cart[id];sub+=cart[id]*p.price}
+ const ship=n===0||n>=S.freeFrom?0:+S.shipping;return{n,sub,ship,tot:sub+ship}}
+function renderCart(){
+ const t=totals();$('cnt').textContent=t.n;
+ $('items').innerHTML=Object.keys(cart).map(id=>{const p=products.find(x=>x.id===id);if(!p)return'';return`<div class="it"><img src="${p.img}" alt=""><div><b>${p.name}</b>${eur(+p.price)}</div><div class="q"><button data-m="${id}">−</button>${cart[id]}<button data-p="${id}">+</button></div></div>`}).join('')||'<p class="note" style="padding:20px 0">Ton panier est vide.</p>';
+ const left=Math.max(0,S.freeFrom-t.n);
+ $('sum').innerHTML=t.n?`<div class="note">${left?`Plus que ${left} sticker${left>1?'s':''} pour la livraison offerte`:'Livraison offerte 🎉'}</div><div class="prog"><i style="width:${Math.min(100,t.n/S.freeFrom*100)}%"></i></div><div><span>Sous-total (TVA incluse)</span><span>${eur(t.sub)}</span></div><div><span>Livraison</span><span>${t.ship?eur(t.ship):'Offerte'}</span></div><div><span>Emballage</span><span class="ok">Offert</span></div><div class="t"><span>Total TTC</span><span>${eur(t.tot)}</span></div><button class="btn" id="co" style="width:100%;margin-top:14px">Commander</button>`:'';
+}
+$('items').onclick=e=>{const p=e.target.dataset.p,m=e.target.dataset.m;if(p)cart[p]++;if(m){cart[m]--;if(cart[m]<=0)delete cart[m]}if(p||m)save()};
+const openCart=()=>{$('drawer').classList.add('on');$('ov').classList.add('on')},closeCart=()=>{$('drawer').classList.remove('on');$('ov').classList.remove('on')};
+$('openCart').onclick=openCart;$('closeCart').onclick=closeCart;$('ov').onclick=closeCart;
+$('sum').onclick=e=>{if(e.target.id!=='co')return;
+ $('mb').innerHTML=`<h3 style="font-size:24px">Finaliser la commande</h3><label>Nom</label><input id="on" autocomplete="name"><label>E-mail</label><input id="oe" type="email" autocomplete="email"><label>Téléphone (facultatif)</label><input id="op" type="tel"><label>Adresse de livraison</label><textarea id="oa" autocomplete="street-address"></textarea><p class="note" style="margin:12px 0">Total à régler : <b>${eur(totals().tot)}</b> TTC. ${CART_MODE?"Paiement sécurisé par Stripe à l'étape suivante.":"Nous te contactons par e-mail pour le paiement."}</p><button class="btn" id="po" style="width:100%">${CART_MODE?"Valider et payer":"Valider la commande"}</button><p class="note" id="om"></p><button class="x" id="mx" style="margin-top:6px;font-size:14px">Annuler</button>`;
+ $('modal').classList.add('on')};
+$('modal').onclick=async e=>{
+ if(e.target.id==='mx'||e.target.id==='modal'){if(embedded){embedded.destroy();embedded=null}$('modal').classList.remove('on')}
+ if(e.target.id==='po'){
+  const v=k=>$(k).value.trim(),name=v('on'),email=v('oe'),addr=v('oa');
+  if(!name||!/\S+@\S+\.\S+/.test(email)||!addr){$('om').textContent='Nom, e-mail valide et adresse sont requis.';return}
+  const t=totals();e.target.disabled=true;
+  try{const items=Object.keys(cart).filter(id=>products.find(p=>p.id===id)).map(id=>{const p=products.find(x=>x.id===id);return{id,name:p.name,price:+p.price,qty:cart[id]}});
+   const r=await addDoc(collection(db,'orders'),{name,email,phone:v('op'),address:addr,items,count:t.n,subtotal:t.sub,shipping:t.ship,total:t.tot,status:CART_MODE?'En attente de paiement':'Nouvelle',created:serverTimestamp()});
+   if(CART_MODE){
+    const res=await fetch(CHECKOUT_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({orderId:r.id})});
+    const j=await res.json();if(!j.clientSecret)throw new Error(j.error||'checkout');
+    closeCart();
+    $('mb').innerHTML='<h3 style="font-size:24px">Paiement</h3><div id="checkout"></div><button class="x" id="mx" style="font-size:14px">Annuler</button>';
+    embedded=await stripe.initEmbeddedCheckout({clientSecret:j.clientSecret});embedded.mount('#checkout');return;
+   }
+   cart={};save();closeCart();
+   $('mb').innerHTML=`<h3 style="font-size:24px" class="ok">Commande reçue ✓</h3><p style="margin:12px 0">Merci ${name} ! Numéro : <b>${r.id.slice(0,8).toUpperCase()}</b>. On t'écrit à ${email} pour le paiement et l'expédition.</p><button class="btn" id="mx">Fermer</button>`;
+  }catch(err){$('om').textContent='Erreur d\'envoi, réessaie.';e.target.disabled=false}}
+};
+
+// Stickers perso
+let img=null;
+const prices={'3.5':1};
+function est(){const q=Math.max(1,+$('cq').value||1);$('est').textContent=eur(prices[$('cs').value]*q)}
+$('cs').onchange=$('cq').oninput=est;est();
+function shrink(file,max=900){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>{const i=new Image();i.onload=()=>{const k=Math.min(1,max/Math.max(i.width,i.height)),c=document.createElement('canvas');c.width=i.width*k;c.height=i.height*k;c.getContext('2d').drawImage(i,0,0,c.width,c.height);res(c.toDataURL('image/webp',.85))};i.onerror=rej;i.src=r.result};r.onerror=rej;r.readAsDataURL(file)})}
+$('cf').onchange=async e=>{const f=e.target.files[0];if(!f)return;img=await shrink(f);$('drop').innerHTML=`<img src="${img}" alt="Aperçu">`};
+$('sendC').onclick=async()=>{
+ const name=$('cn').value.trim(),email=$('ce').value.trim(),m=$('cmsg');
+ if(!name||!/\S+@\S+\.\S+/.test(email)||!img){m.textContent='Ajoute ton nom, un e-mail valide et une image.';return}
+ $('sendC').disabled=true;
+ try{const q=Math.max(1,+$('cq').value||1);
+  await addDoc(collection(db,'custom'),{name,email,size:$('cs').value,qty:q,estimate:prices[$('cs').value]*q,message:$('cm').value.trim(),img,status:'Nouvelle',created:serverTimestamp()});
+  m.innerHTML='<span class="ok">Demande envoyée ✓ On te répond par e-mail avec le devis.</span>';
+ }catch(err){m.textContent='Erreur d\'envoi, réessaie.'}
+ $('sendC').disabled=false};
+load();
+if(new URLSearchParams(location.search).get('session_id')){
+ cart={};save();history.replaceState(null,'',location.pathname);
+ $('mb').innerHTML='<h3 style="font-size:24px" class="ok">Paiement reçu ✓</h3><p style="margin:12px 0">Merci ! Ta commande est confirmée, tu reçois un e-mail de Stripe avec le reçu. On prépare l\'expédition.</p><button class="btn" id="mx">Fermer</button>';
+ $('modal').classList.add('on');
+}
+</script>
+</body>
+</html>
